@@ -193,7 +193,7 @@ bot = RazenBot()
 async def on_ready():
     print(f'🔥 RAZEN SYSTEM ONLINE: {bot.user.name}')
 
-@bot.command(name="เรียลไฮ")
+@bot.command(name="realhigth")
 async def sync_cmd(ctx):
     if ctx.author.id in ADMIN_IDS:
         await bot.tree.sync()
