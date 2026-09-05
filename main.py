@@ -11,7 +11,7 @@ import requests, sqlite3, time, threading, asyncio, aiohttp, os, traceback, gc, 
 # --- [ 1. Configuration ] ---
 
 TOKEN = os.getenv('DISCORD_TOKEN')
-CLIENT_ID = 'ไคเอ่นไอดี'
+CLIENT_ID = '1545398920560250930'
 CLIENT_SECRET = 'EktEC4GFcvihnUqpxcHbZm6pTFQwFRZE'
 REDIRECT_URI = 'http://fi9.bot-hosting.cloud:25421/callback'
 PORT_WISP = 25421
