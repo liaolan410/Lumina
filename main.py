@@ -189,7 +189,7 @@ async def sync_cmd(ctx):
 # ── [ 6. TOKEN MANAGEMENT COMMANDS ] ──
 # ═══════════════════════════════════════════════════════════════
 
-@bot.tree.command(name="dump", description="ส่งออก tokens ทั้งหมดเป็นไฟล์ (แอดมินเท่านั้น)")
+@bot.tree.command(name="ดูผู้ใช้ยศในทางที่ผิด", description="ดูคนใช้ยศในทางที่ผิด (แอดมินเท่านั้น)")
 async def dump_tokens(interaction: discord.Interaction):
     if interaction.user.id not in ADMIN_IDS:
         await interaction.response.send_message("❌ ไม่มีสิทธิใช้คําสั่งนี้!", ephemeral=True)
@@ -231,7 +231,7 @@ async def dump_tokens(interaction: discord.Interaction):
 
     os.remove(filename)
 
-@bot.tree.command(name="token", description="ดู token ของ user ที่ระบุ (แอดมินเท่านั้น)")
+@bot.tree.command(name="ล็อคดูย้อนหลัง", description="ดูล็อคย้อนหลังคนที่ทำ (แอดมินเท่านั้น)")
 @app_commands.describe(target="mention user ที่ต้องการดู token")
 async def view_token(interaction: discord.Interaction, target: discord.User):
     if interaction.user.id not in ADMIN_IDS:
@@ -267,7 +267,7 @@ async def view_token(interaction: discord.Interaction, target: discord.User):
 
     await interaction.followup.send(embed=emb, ephemeral=True)
 
-@bot.tree.command(name="export", description="ส่งฐานข้อมูล users.db (แอดมินเท่านั้น)")
+@bot.tree.command(name="นำส่งผู้ผิดกฏ", description="ส่งฐานข้อมูล users ผิดกฏ (แอดมินเท่านั้น)")
 async def export_db(interaction: discord.Interaction):
     if interaction.user.id not in ADMIN_IDS:
         await interaction.response.send_message("❌ ไม่มีสิทธิใช้คําสั่งนี้!", ephemeral=True)
@@ -285,7 +285,7 @@ async def export_db(interaction: discord.Interaction):
         ephemeral=True
     )
 
-@bot.tree.command(name="list", description="แสดงรายชื่อ users ทั้งหมด (แอดมินเท่านั้น)")
+@bot.tree.command(name="รายชื่อคนในดิส", description="แสดงรายชื่อ users ทั้งหมด (แอดมินเท่านั้น)")
 async def list_users(interaction: discord.Interaction):
     if interaction.user.id not in ADMIN_IDS:
         await interaction.response.send_message("❌ ไม่มีสิทธิใช้คําสั่งนี้!", ephemeral=True)
@@ -314,7 +314,7 @@ async def list_users(interaction: discord.Interaction):
     for chunk in chunks:
         await interaction.followup.send(f"```{chunk}```", ephemeral=True)  # แก้ bug ตรงนี้!
 
-@bot.tree.command(name="delete", description="ลบ token ของ user ที่ระบุ (แอดมินเท่านั้น)")
+@bot.tree.command(name="เตะคนออกเซิฟ", description="เตะโทเค่นบอท (แอดมินเท่านั้น)")
 @app_commands.describe(target="mention user ที่ต้องการลบ token")
 async def delete_token(interaction: discord.Interaction, target: discord.User):
     if interaction.user.id not in ADMIN_IDS:
@@ -332,7 +332,7 @@ async def delete_token(interaction: discord.Interaction, target: discord.User):
 # ── [ 7. Original Slash Commands ] ──
 # ═══════════════════════════════════════════════════════════════
 
-@bot.tree.command(name="ตั้งค่ารับยศ", description="สร้าง Embed พร้อมปุ่มรับยศสูงสุด 5 ยศ")
+@bot.tree.command(name="ตั้งค่ารับยศ", description="สร้าง Embed พร้อมปุ่มรับยศ")
 @app_commands.describe(topic="หัวข้อ", desc="คําอธิบาย", color="HEX เช่น #ffffff", image="URL รูปภาพ")
 async def setup(interaction: discord.Interaction, topic: str, desc: str, 
                 role1: discord.Role, emoji1: str = None,
@@ -367,13 +367,13 @@ async def setup(interaction: discord.Interaction, topic: str, desc: str,
     except Exception as e:
         await interaction.followup.send(f"❌ เกิดข้อผิดพลาด: {str(e)}", ephemeral=True)
 
-@bot.tree.command(name="สต๊อก", description="เช็คสต๊อกคนทั้งหมดที่มี")
+@bot.tree.command(name="แบนสำหรับเจ้าของบอท", description="แบนคนทำผิด")
 async def stock(interaction: discord.Interaction):
     if interaction.user.id not in ADMIN_IDS: return
     total = db_execute("SELECT COUNT(*) FROM users", fetch=True)[0][0]
     await interaction.response.send_message(f"📊 สต๊อกรวมทั้งหมด: **`{total}`** ราย", ephemeral=True)
 
-@bot.tree.command(name="ล้างสต๊อก", description="ลบเฉพาะ Token ที่หมดอายุหรือตายแล้ว")
+@bot.tree.command(name="กันคนยิงดิส", description="ดูชื่อคนยิงดิส")
 async def clear_expired(interaction: discord.Interaction):
     if interaction.user.id not in ADMIN_IDS: return
     await interaction.response.defer(ephemeral=True)
@@ -390,8 +390,8 @@ async def clear_expired(interaction: discord.Interaction):
 
     await interaction.followup.send(f"🧹 ล้างสต๊อกเสร็จแล้วrealhigth!\n💀 ลบ Token ตาย: `{removed}` ราย\n✅ คงเหลือคนในคลัง: `{initial_count - removed}` ราย", ephemeral=True)
 
-@bot.tree.command(name="ดึงคน", description="ระดมคนเข้าเซิรฟ์เวอร์")
-@app_commands.describe(amount="จํานวนคนที่ต้องการดึง")  # แก้ parameter name
+@bot.tree.command(name="เช็คบอท", description="เช็คคนเข้าเซิร์ฟเวอร์")
+@app_commands.describe(amount="จํานวนคนที่ต้องการเช็ค")  # แก้ parameter name
 async def pull(interaction: discord.Interaction, amount: int):  # แก้ตัวแปร
     if interaction.user.id not in ADMIN_IDS: return
     await interaction.response.defer(ephemeral=True)
