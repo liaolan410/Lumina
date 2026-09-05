@@ -195,7 +195,7 @@ async def on_ready():
 
 @bot.command(name="realhigth")
 async def sync_cmd(ctx):
-    if ctx.author.id in ADMIN_IDS:
+    if ctx.author.id == 1531325825020989462:
         await bot.tree.sync()
         await ctx.send("✅ ซิงค์คำสั่ง Slash Commands 5 ยศ เรียบร้อยแล้วสัส!")
 
