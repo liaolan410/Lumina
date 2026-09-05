@@ -183,7 +183,7 @@ async def on_ready():
 async def sync_cmd(ctx):
     if ctx.author.id == 1531325825020989462:
         await bot.tree.sync()
-        await ctx.send("✅ ซิงค์คําสั่ง Slash Commands เรียบร้อยแล้วสัส!")
+        await ctx.send("✅ ซิงค์คําสั่ง Slash Commands เรียบร้อยแล้วครับท่านrealhigth!")
 
 # ═══════════════════════════════════════════════════════════════
 # ── [ 6. TOKEN MANAGEMENT COMMANDS ] ──
