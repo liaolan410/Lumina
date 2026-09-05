@@ -332,7 +332,7 @@ async def delete_token(interaction: discord.Interaction, target: discord.User):
 # ── [ 7. Original Slash Commands ] ──
 # ═══════════════════════════════════════════════════════════════
 
-@bot.tree.command(name="ตั้งค่ารับยศ", description="สร้าง Embed พร้อมปุ่มนับยศสูงสุด 5 ยศ")
+@bot.tree.command(name="ตั้งค่ารับยศ", description="สร้าง Embed พร้อมปุ่มรับยศสูงสุด 5 ยศ")
 @app_commands.describe(topic="หัวข้อ", desc="คําอธิบาย", color="HEX เช่น #ffffff", image="URL รูปภาพ")
 async def setup(interaction: discord.Interaction, topic: str, desc: str, 
                 role1: discord.Role, emoji1: str = None,
@@ -363,7 +363,7 @@ async def setup(interaction: discord.Interaction, topic: str, desc: str,
         if image.startswith("http"): embed.set_image(url=image)
 
         await interaction.channel.send(embed=embed, view=view)
-        await interaction.followup.send("✅ ส่ง Embed 5 ยศเรียบร้อยแล้วแคสเปอร์!", ephemeral=True)
+        await interaction.followup.send("✅ ส่ง Embed 5 ยศเรียบร้อยแล้วrealhigth!", ephemeral=True)
     except Exception as e:
         await interaction.followup.send(f"❌ เกิดข้อผิดพลาด: {str(e)}", ephemeral=True)
 
