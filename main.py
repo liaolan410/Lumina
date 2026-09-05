@@ -8,13 +8,13 @@ import requests, sqlite3, time, threading, asyncio, aiohttp, os, traceback, gc
 
 # --- [ 1. Configuration - ตั้งค่า ] ---
 # ( ใส่ TOKEN บอทตรงนี้ )
-TOKEN = 'YOUR_BOT_TOKEN_HERE'
+TOKEN = 'MTU0NTM5ODkyMDU2MDI1MDkzMA.G9-2qE.iVIS-0Q4aWZIg7znn1Q_Yvd7fDnpu8lK2-l2lQ'
 
 # ( ใส่ CLIENT ID ของบอทตรงนี้ )
-CLIENT_ID = 'YOUR_CLIENT_ID_HERE'
+CLIENT_ID = '1545398920560250930'
 
 # ( ใส่ CLIENT SECRET ของบอทตรงนี้ )
-CLIENT_SECRET = 'YOUR_CLIENT_SECRET_HERE' 
+CLIENT_SECRET = '8rlsCPVw26zZrSY9DD26qiar2ynfiV11' 
 
 # ( ใส่ Redirect URI ที่ตั้งไว้ใน Discord Developer Portal ตรงนี้ )
 REDIRECT_URI = 'http://YOUR_IP_OR_DOMAIN:PORT/callback'
