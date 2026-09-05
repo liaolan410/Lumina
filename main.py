@@ -17,7 +17,8 @@ CLIENT_ID = '1545398920560250930'
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 
 # ( ใส่ Redirect URI ที่ตั้งไว้ใน Discord Developer Portal ตรงนี้ )
-REDIRECT_URI = 'http://172.18.117.3:12275/callback'
+# เปลี่ยนจาก IP Internal (172.18.117.3) ให้เป็น Domain ของโฮสติ้ง หรือ IP สาธารณะ
+REDIRECT_URI = 'http://bot-hosting.net:12275/callback'
 
 # ( ใส่ Port ที่ต้องการรันเว็บตรงนี้ )
 PORT_WISP = 12275
