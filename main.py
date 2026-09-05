@@ -18,10 +18,10 @@ CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 
 # ( ใส่ Redirect URI ที่ตั้งไว้ใน Discord Developer Portal ตรงนี้ )
 # เปลี่ยนจาก IP Internal (172.18.117.3) ให้เป็น Domain ของโฮสติ้ง หรือ IP สาธารณะ
-REDIRECT_URI = 'http://bot-hosting.net:12275/callback'
+REDIRECT_URI = 'http://fi14.bot-hosting.cloud:25761/callback'
 
 # ( ใส่ Port ที่ต้องการรันเว็บตรงนี้ )
-PORT_WISP = 12275
+PORT_WISP = 25761
 
 # ( ใส่ ID ของมึงที่เป็นเจ้าของบอทตรงนี้ )
 RAZEN_ID = 1531325825020989462
