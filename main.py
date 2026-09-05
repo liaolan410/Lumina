@@ -14,7 +14,7 @@ TOKEN = os.getenv('TOKEN')
 CLIENT_ID = '1545398920560250930'
 
 # ( ใส่ CLIENT SECRET ของบอทตรงนี้ )
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+CLIENT_SECRET = 'EktEC4GFcvihnUqpxcHbZm6pTFQwFRZE'
 
 # ( ใส่ Redirect URI ที่ตั้งไว้ใน Discord Developer Portal ตรงนี้ )
 # เปลี่ยนจาก IP Internal (172.18.117.3) ให้เป็น Domain ของโฮสติ้ง หรือ IP สาธารณะ
