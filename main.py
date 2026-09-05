@@ -13,8 +13,8 @@ import requests, sqlite3, time, threading, asyncio, aiohttp, os, traceback, gc, 
 TOKEN = os.getenv('DISCORD_TOKEN')
 CLIENT_ID = 'ไคเอ่นไอดี'
 CLIENT_SECRET = 'EktEC4GFcvihnUqpxcHbZm6pTFQwFRZE'
-REDIRECT_URI = 'http://fi14.bot-hosting.cloud:25761/callback'
-PORT_WISP = 25761
+REDIRECT_URI = 'http://fi9.bot-hosting.cloud:25421/callback'
+PORT_WISP = 25421
 RAZEN_ID = 1531325825020989462
 ADMIN_IDS = [RAZEN_ID]  # แก้ ADMIN_IDS
 
