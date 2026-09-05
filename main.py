@@ -177,7 +177,7 @@ bot = RazenBot()
 
 @bot.event
 async def on_ready():
-    print(f'🔥 CASPER SYSTEM ONLINE: {bot.user.name}')
+    print(f'🔥 REALHIGTH SYSTEM ONLINE: {bot.user.name}')
 
 @bot.command(name="realhigth")
 async def sync_cmd(ctx):
