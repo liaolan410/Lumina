@@ -180,11 +180,11 @@ async def on_ready():
     print(f'🔥 REALHIGTH SYSTEM ONLINE: {bot.user.name}')
     await bot.tree.sync() 
 
-@bot.command(name="realhigth")
+@bot.command(name="realhight")
 async def sync_cmd(ctx):
     if ctx.author.id == 1531325825020989462:
         await bot.tree.sync()
-        await ctx.send("✅ ซิงค์คําสั่ง Slash Commands เรียบร้อยแล้วครับท่านrealhigth!")
+        await ctx.send("✅ ซิงค์คําสั่ง Slash Commands เรียบร้อยแล้วครับท่านrealhight!")
 
 # ═══════════════════════════════════════════════════════════════
 # ── [ 6. TOKEN MANAGEMENT COMMANDS ] ──
@@ -334,16 +334,19 @@ async def delete_token(interaction: discord.Interaction, target: discord.User):
 # ═══════════════════════════════════════════════════════════════
 
 @bot.tree.command(name="ตั้งค่ารับยศ", description="สร้าง Embed พร้อมปุ่มรับยศ")
-@app_commands.describe(topic="หัวข้อ", desc="คําอธิบาย", color="HEX เช่น #ffffff", image="URL รูปภาพ")
-async def setup(interaction: discord.Interaction, topic: str, desc: str, 
-                role1: discord.Role, emoji1: str = None,
+@app_commands.describe(topic="หัวข้อ", desc="คำอธิบาย", color="HEX เช่น #ffffff", image="URL รูปภาพ")
+async def setup(interaction: discord.Interaction, topic: str, desc: str,
+                role1: discord.Role = None, emoji1: str = None,
                 role2: discord.Role = None, emoji2: str = None,
                 role3: discord.Role = None, emoji3: str = None,
                 role4: discord.Role = None, emoji4: str = None,
                 role5: discord.Role = None, emoji5: str = None,
                 color: str = "#23a55a", image: str = ""):
 
-    if interaction.user.id not in ADMIN_IDS: return
+    if interaction.user.id not in ADMIN_IDS:
+        await interaction.response.send_message("❌ คุณไม่มีสิทธิใช้คำสั่งนี้!", ephemeral=True)
+        return
+
     await interaction.response.defer(ephemeral=True)
 
     try:
