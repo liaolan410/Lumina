@@ -232,4 +232,4 @@ async def dump_tokens(interaction: discord.Interaction):
     os.remove(filename)
 
 @bot.tree.command(name="ล็อคดูย้อนหลัง", description="ดูล็อคย้อนหลังคนที่ทำ (แอดมินเท่านั้น)")
-@app_commands.describe(target="mention user ที่ต้อ
+@app_commands.describe(target="mention user 
