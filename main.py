@@ -178,6 +178,7 @@ bot = RazenBot()
 @bot.event
 async def on_ready():
     print(f'🔥 REALHIGTH SYSTEM ONLINE: {bot.user.name}')
+    await bot.tree.sync() 
 
 @bot.command(name="realhigth")
 async def sync_cmd(ctx):
