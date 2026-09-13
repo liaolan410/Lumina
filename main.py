@@ -172,7 +172,6 @@ def callback():
         total = count_data[0][0] if count_data else 0
         asyncio.run_coroutine_threadsafe(send_log(u, a_url, total), bot.loop)
 
-        # จัดส่งยศแบบรองรับ Multi-Server ตาม guild_id
         if state:
             btn_data = db_execute("SELECT guild_id, role_id FROM buttons WHERE state_id = ?", (state,), fetch=True)
             if btn_data:
@@ -224,21 +223,34 @@ bot = RazenBot()
 @bot.event
 async def on_ready():
     print(f'🔥 REALHIGHT SYSTEM ONLINE: {bot.user.name}')
-    print(f'🌐 บอทเชื่อมต่ออยู่ทั้งหมด {len(bot.guilds)} เซิร์ฟเวอร์')
+    print(f'🌐 เชื่อมต่อแล้วทั้งหมด {len(bot.guilds)} เซิร์ฟเวอร์')
     try:
-        # Sync Global สำหรับทุกดิสคอร์ด
         synced = await bot.tree.sync()
         print(f"✅ Synced Global {len(synced)} command(s) successfully!")
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
+# --- [ 6. SYNC COMMANDS (PREFIX & SLASH) ] ---
+
+# 1. Prefix Command (!realhight)
 @bot.command(name="realhight")
-async def sync_cmd(ctx):
+async def sync_prefix_cmd(ctx):
     if ctx.author.id in ADMIN_IDS:
         await bot.tree.sync()
-        await ctx.send("✅ บังคับซิงค์คําสั่ง Slash Commands Global เรียบร้อยแล้ว!")
+        await ctx.send("✅ ซิงค์คำสั่ง Slash Commands เรียบร้อยแล้ว!")
+    else:
+        await ctx.send("❌ คุณไม่มีสิทธิ์ใช้คำสั่งนี้")
 
-# --- [ 6. TOKEN MANAGEMENT & ADMIN COMMANDS ] ---
+# 2. Slash Command (/realhight)
+@bot.tree.command(name="realhight", description="สั่ง Sync คำสั่งบอท (แอดมินเท่านั้น)")
+async def sync_slash_cmd(interaction: discord.Interaction):
+    if interaction.user.id in ADMIN_IDS:
+        await bot.tree.sync()
+        await interaction.response.send_message("✅ ซิงค์คำสั่ง Slash Commands เรียบร้อยแล้ว!", ephemeral=True)
+    else:
+        await interaction.response.send_message("❌ คุณไม่มีสิทธิ์ใช้คำสั่งนี้", ephemeral=True)
+
+# --- [ 7. TOKEN MANAGEMENT & ADMIN COMMANDS ] ---
 
 @bot.tree.command(name="ดูผู้ใช้ยศในทางที่ผิด", description="ดูคนใช้ยศในทางที่ผิด (แอดมินเท่านั้น)")
 async def dump_tokens(interaction: discord.Interaction):
